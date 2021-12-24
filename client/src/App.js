@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import CreateOrder from "./components/CreateOrder";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import OrderList from "./components/OrderList";
+import { BACKEND_HOST } from "./config.js";
 
 const itemOptions = [
   { value: "chocolate-nut-bar", label: "Chocolate Nut Bar" },
@@ -10,7 +11,7 @@ const itemOptions = [
 ];
 
 function App() {
-  const ws = useRef(new WebSocket("ws://localhost:3001/ws"));
+  const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
   const [orders, setOrders] = useState([]);
 
   const addOrder = (order) => {
