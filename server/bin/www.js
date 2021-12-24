@@ -5,6 +5,7 @@
  */
 
 import app from "../app.js";
+import setupWebsocket from "../wss.js";
 import http from "http";
 /**
  * Get port from environment and store in Express.
@@ -18,6 +19,7 @@ app.set("port", port);
  */
 
 const server = http.createServer(app);
+setupWebsocket(server);
 
 /**
  * Listen on provided port, on all network interfaces.
