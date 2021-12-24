@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import CreateOrder from "./components/CreateOrder";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -9,13 +9,26 @@ const itemOptions = [
 ];
 
 function App() {
-  const onCreateOrder = (order) => {
-    console.log(order);
+  const ws = useRef(new WebSocket("ws://localhost:3001/ws"));
+  useEffect(() => {
+    ws.current.onmessage = ({ data }) => {
+      const event = JSON.parse(data);
+      console.log(event);
+    };
+  });
+
+  const send = (action) => {
+    ws.current.send(JSON.stringify(action));
   };
 
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:3001/ws");
-  }, []);
+  const onCreateOrder = (order) => {
+    send({
+      type: "NEW_ORDER",
+      payload: {
+        order,
+      },
+    });
+  };
 
   return (
     <BrowserRouter>
