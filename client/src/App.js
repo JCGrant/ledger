@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import CreateOrder from "./components/CreateOrder";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import OrderList from "./components/OrderList";
 
 const itemOptions = [
   { value: "chocolate-nut-bar", label: "Chocolate Nut Bar" },
@@ -10,15 +11,35 @@ const itemOptions = [
 
 function App() {
   const ws = useRef(new WebSocket("ws://localhost:3001/ws"));
+  const [orders, setOrders] = useState([]);
+
+  const addOrder = (order) => {
+    setOrders([order, ...orders]);
+  };
+
   useEffect(() => {
     ws.current.onmessage = ({ data }) => {
       const event = JSON.parse(data);
-      console.log(event);
+      handleEvent(event);
     };
   });
 
   const send = (action) => {
     ws.current.send(JSON.stringify(action));
+  };
+
+  const handleEvent = (event) => {
+    console.log(event);
+    switch (event.type) {
+      case "SEND_STATE":
+        setOrders(event.payload.state.orders);
+        return;
+      case "NEW_ORDER":
+        addOrder(event.payload.order);
+        return;
+      default:
+        return;
+    }
   };
 
   const onCreateOrder = (order) => {
@@ -39,6 +60,7 @@ function App() {
             <CreateOrder options={itemOptions} onCreateOrder={onCreateOrder} />
           }
         />
+        <Route path="/orders" element={<OrderList orders={orders} />} />
       </Routes>
     </BrowserRouter>
   );
