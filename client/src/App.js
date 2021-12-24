@@ -4,18 +4,30 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import OrderList from "./components/OrderList";
 import { BACKEND_HOST } from "./config.js";
 
-const itemOptions = [
-  { value: "chocolate-nut-bar", label: "Chocolate Nut Bar" },
-  { value: "jaffa-cakes", label: "Jaffa Cake" },
-  { value: "lindt-small-ball", label: "Lindt Small Ball" },
-];
+function arrToMap(array) {
+  return array.reduce(
+    (acc, object) => ({
+      ...acc,
+      [object.id]: object,
+    }),
+    {}
+  );
+}
 
 function App() {
   const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
-  const [orders, setOrders] = useState([]);
+  const [state, setState] = useState({
+    orders: [],
+    users: [],
+    items: [],
+  });
+  const [userId, setUserId] = useState(5); // temp manual id
 
-  const addOrder = (order) => {
-    setOrders([order, ...orders]);
+  const addOrders = (orders) => {
+    setState({
+      ...state,
+      orders: [...orders, ...state.orders],
+    });
   };
 
   useEffect(() => {
@@ -33,10 +45,10 @@ function App() {
     console.log(event);
     switch (event.type) {
       case "SEND_STATE":
-        setOrders(event.payload.state.orders);
+        setState(event.payload.state);
         return;
-      case "NEW_ORDER":
-        addOrder(event.payload.order);
+      case "NEW_ORDERS":
+        addOrders(event.payload.orders);
         return;
       default:
         return;
@@ -47,21 +59,34 @@ function App() {
     send({
       type: "NEW_ORDER",
       payload: {
-        order,
+        order: { ...order, userId },
       },
     });
   };
 
+  const userMap = arrToMap(state.users);
+  const itemMap = arrToMap(state.items);
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path="/orders/new"
           element={
-            <CreateOrder options={itemOptions} onCreateOrder={onCreateOrder} />
+            <CreateOrder items={state.items} onCreateOrder={onCreateOrder} />
           }
         />
-        <Route path="/orders" element={<OrderList orders={orders} />} />
+        <Route
+          path="/orders"
+          element={
+            <OrderList
+              orders={state.orders.map((order) => ({
+                ...order,
+                user: userMap[order.userId],
+                item: itemMap[order.itemId],
+              }))}
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

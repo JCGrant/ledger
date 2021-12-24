@@ -1,14 +1,11 @@
 const OrderList = ({ orders }) => {
   return (
     <ul>
-      {orders.map(
-        ({ selectedItem, direction, requestedAmount, requestedPrice }, i) => (
-          <li key={i}>
-            {selectedItem} - {direction} - {requestedAmount} Amount -{" "}
-            {requestedPrice} Price
-          </li>
-        )
-      )}
+      {orders.map(({ id, item, user, direction, price }) => (
+        <li key={id}>
+          {user.name} is {direction}ing a {item.name} for {price} tokens
+        </li>
+      ))}
     </ul>
   );
 };

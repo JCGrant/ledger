@@ -1,14 +1,14 @@
 import { useState } from "react";
 import Select from "react-select";
 
-const CreateOrder = ({ options, onCreateOrder }) => {
-  const [selectedItem, setSelectedItem] = useState(undefined);
+const CreateOrder = ({ items, onCreateOrder }) => {
+  const [itemId, setItemId] = useState(undefined);
   const [direction, setDirection] = useState("buy");
-  const [requestedAmount, setRequestedAmount] = useState(1);
-  const [requestedPrice, setRequestedPrice] = useState(0);
+  const [amount, setAmount] = useState(1);
+  const [price, setPrice] = useState(0);
 
-  const onChangeSelectedItem = (e) => {
-    setSelectedItem(e.value);
+  const onChangeItem = (e) => {
+    setItemId(e.value);
   };
 
   const onChangeDirection = (e) => {
@@ -19,31 +19,42 @@ const CreateOrder = ({ options, onCreateOrder }) => {
   const onChangeRequestedAmount = (e) => {
     const valueStr = e.target.value;
     const value = valueStr === "" ? undefined : parseInt(valueStr, 10);
-    setRequestedAmount(value);
+    setAmount(value);
   };
 
   const onChangeRequestedPrice = (e) => {
     const valueStr = e.target.value;
     const value = valueStr === "" ? undefined : parseInt(valueStr, 10);
-    setRequestedPrice(value);
+    setPrice(value);
   };
 
   const onSubmitButton = () => {
-    if (selectedItem === undefined) {
+    if (itemId === undefined) {
       return;
     }
-    if (requestedAmount === undefined || requestedAmount === 0) {
+    if (amount === undefined || amount === 0) {
       return;
     }
-    if (requestedPrice === undefined || requestedPrice === 0) {
+    if (price === undefined || price === 0) {
       return;
     }
-    onCreateOrder({ selectedItem, direction, requestedAmount, requestedPrice });
+    onCreateOrder({
+      itemId,
+      direction,
+      amount,
+      price,
+    });
   };
 
   return (
     <div>
-      <Select onChange={onChangeSelectedItem} options={options} />
+      <Select
+        onChange={onChangeItem}
+        options={Object.values(items).map(({ id, name }) => ({
+          value: id,
+          label: name,
+        }))}
+      />
       <div>
         <select value={direction} onChange={onChangeDirection}>
           <option value="buy">Buy</option>
@@ -53,7 +64,7 @@ const CreateOrder = ({ options, onCreateOrder }) => {
       <label>
         Amount:{" "}
         <input
-          value={requestedAmount ?? ""}
+          value={amount ?? ""}
           onChange={onChangeRequestedAmount}
           type="number"
         />
@@ -61,7 +72,7 @@ const CreateOrder = ({ options, onCreateOrder }) => {
       <label>
         Price:{" "}
         <input
-          value={requestedPrice ?? ""}
+          value={price ?? ""}
           onChange={onChangeRequestedPrice}
           type="number"
         />
