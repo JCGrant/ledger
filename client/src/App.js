@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import TransactionList from "./components/TransactionList";
 import { arrToMap } from "common/utils";
 import UserProfile from "./components/UserProfile";
+import "./App.styles.scss";
 
 function App() {
   const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
@@ -152,41 +153,49 @@ function App() {
   }
   return (
     <BrowserRouter>
-      <div>
-        <Link to="/">Home</Link>
+      <div className="space-lg">
+        <header className="header">
+          <nav className="navigation">
+            <Link to="/">Home</Link>
+            <Link to="/orders/new">Create Order</Link>
+            <Link to="/order">View Orders</Link>
+          </nav>
+        </header>
+        <main className="container">
+          <Routes>
+            <Route
+              path="/orders/new"
+              element={
+                <CreateOrder
+                  user={localUser}
+                  items={items}
+                  onCreateOrder={onCreateOrder}
+                />
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <OrderList
+                  orders={orders}
+                  localUser={localUser}
+                  onClickDeleteOrder={onClickDeleteOrder}
+                />
+              }
+            />
+            <Route
+              path="/transactions"
+              element={<TransactionList transactions={transactions} />}
+            />
+            <Route
+              path="/users/:userId"
+              element={<UserProfile userMap={userMap} />}
+            />
+            <Route path="/" element={<Home user={localUser} users={users} />} />
+            <Route path="*" element={<Navigate replace to="/" />} />
+          </Routes>
+        </main>
       </div>
-      <Routes>
-        <Route
-          path="/orders/new"
-          element={
-            <CreateOrder
-              user={localUser}
-              items={items}
-              onCreateOrder={onCreateOrder}
-            />
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <OrderList
-              orders={orders}
-              localUser={localUser}
-              onClickDeleteOrder={onClickDeleteOrder}
-            />
-          }
-        />
-        <Route
-          path="/transactions"
-          element={<TransactionList transactions={transactions} />}
-        />
-        <Route
-          path="/users/:userId"
-          element={<UserProfile userMap={userMap} />}
-        />
-        <Route path="/" element={<Home user={localUser} users={users} />} />
-        <Route path="*" element={<Navigate replace to="/" />} />
-      </Routes>
     </BrowserRouter>
   );
 }
