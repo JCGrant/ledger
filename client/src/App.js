@@ -50,6 +50,20 @@ function App() {
     }));
   };
 
+  const updateUser = (id, newState) => {
+    setState((state) => ({
+      ...state,
+      users: state.users.map((user) =>
+        user.id !== id
+          ? user
+          : {
+              ...user,
+              ...newState,
+            }
+      ),
+    }));
+  };
+
   useEffect(() => {
     ws.current.onmessage = ({ data }) => {
       const event = JSON.parse(data);
@@ -73,6 +87,7 @@ function App() {
       case "ORDERS_COMPLETED":
         event.payload.orders.forEach((order) => updateOrder(order.id, order));
         addTransaction(event.payload.transaction);
+        event.payload.users.forEach((user) => updateUser(user.id, user));
         return;
       default:
         return;
@@ -105,6 +120,7 @@ function App() {
     item: itemMap[order.itemId],
   }));
   const orderMap = arrToMap(orders);
+  const localUser = userMap[userId];
   const transactions = state.transactions.map((transaction) => ({
     ...transaction,
     buyOrder: orderMap[transaction.buyOrderId],
@@ -121,7 +137,13 @@ function App() {
       <Routes>
         <Route
           path="/orders/new"
-          element={<CreateOrder items={items} onCreateOrder={onCreateOrder} />}
+          element={
+            <CreateOrder
+              user={localUser}
+              items={items}
+              onCreateOrder={onCreateOrder}
+            />
+          }
         />
         <Route path="/orders" element={<OrderList orders={orders} />} />
         <Route
@@ -132,10 +154,7 @@ function App() {
           path="/users/:userId"
           element={<UserProfile userMap={userMap} />}
         />
-        <Route
-          path="/"
-          element={<Home user={userMap[userId]} users={users} />}
-        />
+        <Route path="/" element={<Home user={localUser} users={users} />} />
         <Route path="*" element={<Navigate replace to="/" />} />
       </Routes>
     </BrowserRouter>

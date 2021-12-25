@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Select from "react-select";
 
-const CreateOrder = ({ items, onCreateOrder }) => {
+const CreateOrder = ({ user, items, onCreateOrder }) => {
   const [selectedItem, setSelectedItem] = useState(undefined);
   const [direction, setDirection] = useState("buy");
   const [amount, setAmount] = useState(1);
@@ -52,6 +52,7 @@ const CreateOrder = ({ items, onCreateOrder }) => {
   return (
     <div>
       <h1>Create an Order</h1>
+      <p>Num tokens: {user.numTokens}</p>
       <Select
         value={selectedItem ?? null}
         onChange={onChangeItem}

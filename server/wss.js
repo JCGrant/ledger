@@ -58,27 +58,33 @@ setInterval(async () => {
       }
       const [highestBuy, lowestSell] = pair;
       const settledPrice = (highestBuy.price + lowestSell.price) / 2;
-      const [updatedHighestBuy, updatedLowestSell, transaction] =
-        await Promise.all([
-          updateOrder(highestBuy.id, [["completed", true]]),
-          updateOrder(lowestSell.id, [["completed", true]]),
-          insertTransaction({
-            buyOrderId: highestBuy.id,
-            sellOrderId: lowestSell.id,
-          }),
-          updateUser(highestBuy.userId, [
-            ["num_tokens", userMap[highestBuy.userId].numTokens - settledPrice],
-          ]),
-          updateUser(lowestSell.userId, [
-            ["num_tokens", userMap[lowestSell.userId].numTokens + settledPrice],
-          ]),
-        ]);
+      const [
+        updatedHighestBuy,
+        updatedLowestSell,
+        transaction,
+        updatedBuyer,
+        updatedSeller,
+      ] = await Promise.all([
+        updateOrder(highestBuy.id, [["completed", true]]),
+        updateOrder(lowestSell.id, [["completed", true]]),
+        insertTransaction({
+          buyOrderId: highestBuy.id,
+          sellOrderId: lowestSell.id,
+        }),
+        updateUser(highestBuy.userId, [
+          ["num_tokens", userMap[highestBuy.userId].numTokens - settledPrice],
+        ]),
+        updateUser(lowestSell.userId, [
+          ["num_tokens", userMap[lowestSell.userId].numTokens + settledPrice],
+        ]),
+      ]);
       console.log(pair);
       const event = {
         type: "ORDERS_COMPLETED",
         payload: {
           orders: [updatedHighestBuy, updatedLowestSell],
           transaction,
+          users: [updatedBuyer, updatedSeller],
         },
       };
       wss.clients.forEach((client) => client.send(JSON.stringify(event)));
