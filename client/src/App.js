@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import CreateOrder from "./components/CreateOrder";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import OrderList from "./components/OrderList";
 import { BACKEND_HOST } from "./config.js";
 import Home from "./components/Home";
@@ -85,6 +85,9 @@ function App() {
   }
   return (
     <BrowserRouter>
+      <div>
+        <Link to="/">Home</Link>
+      </div>
       <Routes>
         <Route
           path="/orders/new"
