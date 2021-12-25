@@ -11,6 +11,7 @@ const Order = ({
   const wasOrderedByLocalUser = user.id === localUser.id;
   return (
     <li
+      className="order-item"
       key={id}
       style={{
         color: direction === "buy" ? "green" : "red",
@@ -27,9 +28,9 @@ const Order = ({
 
 const OrderList = ({ localUser, orders, onClickDeleteOrder }) => {
   return (
-    <div>
+    <div className="order-list container">
       <h1>Orders</h1>
-      <ul>
+      <ul className="order-list-wrapper">
         {orders.map((order) => (
           <Order
             key={order.id}
