@@ -58,7 +58,9 @@ setInterval(async () => {
         return;
       }
       const [highestBuy, lowestSell] = pair;
-      const settledPrice = (highestBuy.price + lowestSell.price) / 2;
+      const settledPrice = Math.floor(
+        (highestBuy.price + lowestSell.price) / 2
+      );
       const buyer = userMap[highestBuy.userId];
       const seller = userMap[lowestSell.userId];
       if (buyer.numTokens < settledPrice) {
