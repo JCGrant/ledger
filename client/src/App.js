@@ -7,6 +7,7 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import TransactionList from "./components/TransactionList";
 import { arrToMap } from "common/utils";
+import UserProfile from "./components/UserProfile";
 
 function App() {
   const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
@@ -95,8 +96,9 @@ function App() {
   if (!state) {
     return <div>loading...</div>;
   }
-  const userMap = arrToMap(state.users);
-  const itemMap = arrToMap(state.items);
+  const { users, items } = state;
+  const userMap = arrToMap(users);
+  const itemMap = arrToMap(items);
   const orders = state.orders.map((order) => ({
     ...order,
     user: userMap[order.userId],
@@ -119,16 +121,21 @@ function App() {
       <Routes>
         <Route
           path="/orders/new"
-          element={
-            <CreateOrder items={state.items} onCreateOrder={onCreateOrder} />
-          }
+          element={<CreateOrder items={items} onCreateOrder={onCreateOrder} />}
         />
         <Route path="/orders" element={<OrderList orders={orders} />} />
         <Route
           path="/transactions"
           element={<TransactionList transactions={transactions} />}
         />
-        <Route path="/" element={<Home user={userMap[userId]} />} />
+        <Route
+          path="/users/:userId"
+          element={<UserProfile userMap={userMap} />}
+        />
+        <Route
+          path="/"
+          element={<Home user={userMap[userId]} users={users} />}
+        />
         <Route path="*" element={<Navigate replace to="/" />} />
       </Routes>
     </BrowserRouter>
