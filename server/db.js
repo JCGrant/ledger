@@ -91,6 +91,13 @@ export async function updateOrder(id, values) {
   return convertOrder(result.rows[0]);
 }
 
+export async function deleteOrder(id) {
+  const result = await pool.query(
+    `DELETE FROM orders WHERE id = ${id} RETURNING *`
+  );
+  return convertOrder(result.rows[0]);
+}
+
 export async function insertOrders(order, amount) {
   return await Promise.all(
     Array.from({ length: amount }).map(() => insertOrder(order))

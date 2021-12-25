@@ -43,6 +43,13 @@ function App() {
     }));
   };
 
+  const deleteOrder = ({ id }) => {
+    setState((state) => ({
+      ...state,
+      orders: state.orders.filter((order) => order.id !== id),
+    }));
+  };
+
   const addTransaction = (transaction) => {
     setState((state) => ({
       ...state,
@@ -89,6 +96,9 @@ function App() {
         addTransaction(event.payload.transaction);
         event.payload.users.forEach((user) => updateUser(user.id, user));
         return;
+      case "DELETE_ORDER":
+        deleteOrder(event.payload.order);
+        return;
       default:
         return;
     }
@@ -102,6 +112,17 @@ function App() {
       },
     });
   };
+
+  const onClickDeleteOrder =
+    ({ id }) =>
+    () => {
+      send({
+        type: "DELETE_ORDER",
+        payload: {
+          id,
+        },
+      });
+    };
 
   const onLogin = (userId) => {
     setUserId(userId);
@@ -127,7 +148,7 @@ function App() {
     sellOrder: orderMap[transaction.sellOrderId],
   }));
   if (userId === undefined) {
-    return <Login users={state.users} onLogin={onLogin} />;
+    return <Login users={users} onLogin={onLogin} />;
   }
   return (
     <BrowserRouter>
@@ -145,7 +166,16 @@ function App() {
             />
           }
         />
-        <Route path="/orders" element={<OrderList orders={orders} />} />
+        <Route
+          path="/orders"
+          element={
+            <OrderList
+              orders={orders}
+              localUser={localUser}
+              onClickDeleteOrder={onClickDeleteOrder}
+            />
+          }
+        />
         <Route
           path="/transactions"
           element={<TransactionList transactions={transactions} />}

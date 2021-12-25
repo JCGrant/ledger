@@ -9,6 +9,7 @@ import {
   insertTransaction,
   updateUser,
   getUsers,
+  deleteOrder,
 } from "./db.js";
 
 const wss = new WebSocketServer({ noServer: true });
@@ -107,7 +108,7 @@ wss.on("connection", async function connection(ws) {
     const action = JSON.parse(data);
     console.log(action);
     switch (action.type) {
-      case "NEW_ORDER":
+      case "NEW_ORDER": {
         const order = action.payload.order;
         const newOrders = await insertOrders(order, order.amount);
         const event = {
@@ -118,6 +119,19 @@ wss.on("connection", async function connection(ws) {
         };
         wss.clients.forEach((client) => client.send(JSON.stringify(event)));
         return;
+      }
+      case "DELETE_ORDER": {
+        const { id } = action.payload;
+        const deletedOrder = await deleteOrder(id);
+        const event = {
+          type: "DELETE_ORDER",
+          payload: {
+            order: deletedOrder,
+          },
+        };
+        wss.clients.forEach((client) => client.send(JSON.stringify(event)));
+        return;
+      }
     }
   });
 });
