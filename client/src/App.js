@@ -5,6 +5,7 @@ import OrderList from "./components/OrderList";
 import { BACKEND_HOST } from "./config.js";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import TransactionList from "./components/TransactionList";
 
 function arrToMap(array) {
   return array.reduce(
@@ -50,6 +51,13 @@ function App() {
     }));
   };
 
+  const addTransaction = (transaction) => {
+    setState((state) => ({
+      ...state,
+      transactions: [transaction, ...state.transactions],
+    }));
+  };
+
   useEffect(() => {
     ws.current.onmessage = ({ data }) => {
       const event = JSON.parse(data);
@@ -72,6 +80,7 @@ function App() {
         return;
       case "ORDERS_COMPLETED":
         event.payload.orders.forEach((order) => updateOrder(order.id, order));
+        addTransaction(event.payload.transaction);
         return;
       default:
         return;
@@ -97,6 +106,17 @@ function App() {
   }
   const userMap = arrToMap(state.users);
   const itemMap = arrToMap(state.items);
+  const orders = state.orders.map((order) => ({
+    ...order,
+    user: userMap[order.userId],
+    item: itemMap[order.itemId],
+  }));
+  const orderMap = arrToMap(orders);
+  const transactions = state.transactions.map((transaction) => ({
+    ...transaction,
+    buyOrder: orderMap[transaction.buyOrderId],
+    sellOrder: orderMap[transaction.sellOrderId],
+  }));
   if (userId === undefined) {
     return <Login users={state.users} onLogin={onLogin} />;
   }
@@ -112,17 +132,10 @@ function App() {
             <CreateOrder items={state.items} onCreateOrder={onCreateOrder} />
           }
         />
+        <Route path="/orders" element={<OrderList orders={orders} />} />
         <Route
-          path="/orders"
-          element={
-            <OrderList
-              orders={state.orders.map((order) => ({
-                ...order,
-                user: userMap[order.userId],
-                item: itemMap[order.itemId],
-              }))}
-            />
-          }
+          path="/transactions"
+          element={<TransactionList transactions={transactions} />}
         />
         <Route path="/" element={<Home user={userMap[userId]} />} />
         <Route path="*" element={<Navigate replace to="/" />} />

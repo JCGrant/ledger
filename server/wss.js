@@ -5,6 +5,7 @@ import {
   getOrders,
   getItems,
   updateOrder,
+  insertTransaction,
 } from "./db.js";
 
 const wss = new WebSocketServer({ noServer: true });
@@ -51,19 +52,24 @@ setInterval(async () => {
         return;
       }
       const [highestBuy, lowestSell] = pair;
-      const updatedOrders = await Promise.all([
-        updateOrder(highestBuy.id, [["completed", true]]),
-        updateOrder(lowestSell.id, [["completed", true]]),
-      ]);
+      const [updatedHighestBuy, updatedLowestSell, transaction] =
+        await Promise.all([
+          updateOrder(highestBuy.id, [["completed", true]]),
+          updateOrder(lowestSell.id, [["completed", true]]),
+          insertTransaction({
+            buyOrderId: highestBuy.id,
+            sellOrderId: lowestSell.id,
+          }),
+        ]);
       console.log(pair);
       const event = {
         type: "ORDERS_COMPLETED",
         payload: {
-          orders: updatedOrders,
+          orders: [updatedHighestBuy, updatedLowestSell],
+          transaction,
         },
       };
       wss.clients.forEach((client) => client.send(JSON.stringify(event)));
-      // create transaction
       // update user wallet
       // create user inventory, and move the owned items to other user
       // display wallet and items in user profiles

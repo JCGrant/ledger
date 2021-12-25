@@ -51,7 +51,7 @@ function convertOrder(dbOrder) {
     userId: dbOrder.user_id,
     price: dbOrder.price,
     direction: dbOrder.direction,
-    timestamp: dbOrder.timestamp,
+    timestamp: parseInt(dbOrder.timestamp, 10),
     completed: dbOrder.completed,
   };
 }
@@ -87,15 +87,42 @@ export async function insertOrders(order, amount) {
   );
 }
 
+function convertTransaction(dbTransaction) {
+  return {
+    id: dbTransaction.id,
+    buyOrderId: dbTransaction.buy_order_id,
+    sellOrderId: dbTransaction.sell_order_id,
+    timestamp: parseInt(dbTransaction.timestamp, 10),
+  };
+}
+
+export async function getTransactions() {
+  const result = await pool.query(
+    "SELECT * FROM transactions ORDER BY id DESC"
+  );
+  return result.rows.map(convertTransaction);
+}
+
+export async function insertTransaction({ buyOrderId, sellOrderId }) {
+  const timestamp = Date.now();
+  const result = await pool.query(
+    "INSERT INTO transactions(buy_order_id, sell_order_id, timestamp) VALUES($1, $2, $3) RETURNING *",
+    [buyOrderId, sellOrderId, timestamp]
+  );
+  return convertTransaction(result.rows[0]);
+}
+
 export async function getState() {
-  const [users, items, orders] = await Promise.all([
+  const [users, items, orders, transactions] = await Promise.all([
     getUsers(),
     getItems(),
     getOrders(),
+    getTransactions(),
   ]);
   return {
     users,
     items,
     orders,
+    transactions,
   };
 }
