@@ -1,4 +1,5 @@
 import { WebSocketServer } from "ws";
+import { arrToMap } from "common/utils.js";
 import {
   insertOrders,
   getState,
@@ -6,6 +7,8 @@ import {
   getItems,
   updateOrder,
   insertTransaction,
+  updateUser,
+  getUsers,
 } from "./db.js";
 
 const wss = new WebSocketServer({ noServer: true });
@@ -44,6 +47,8 @@ function getBuySellPair(orders, item) {
 
 setInterval(async () => {
   const items = await getItems();
+  const users = await getUsers();
+  const userMap = arrToMap(users);
   items.forEach(async (item) => {
     while (true) {
       const orders = await getOrders();
@@ -52,6 +57,7 @@ setInterval(async () => {
         return;
       }
       const [highestBuy, lowestSell] = pair;
+      const settledPrice = (highestBuy.price + lowestSell.price) / 2;
       const [updatedHighestBuy, updatedLowestSell, transaction] =
         await Promise.all([
           updateOrder(highestBuy.id, [["completed", true]]),
@@ -60,6 +66,12 @@ setInterval(async () => {
             buyOrderId: highestBuy.id,
             sellOrderId: lowestSell.id,
           }),
+          updateUser(highestBuy.userId, [
+            ["num_tokens", userMap[highestBuy.userId].numTokens - settledPrice],
+          ]),
+          updateUser(lowestSell.userId, [
+            ["num_tokens", userMap[lowestSell.userId].numTokens + settledPrice],
+          ]),
         ]);
       console.log(pair);
       const event = {
@@ -70,7 +82,6 @@ setInterval(async () => {
         },
       };
       wss.clients.forEach((client) => client.send(JSON.stringify(event)));
-      // update user wallet
       // create user inventory, and move the owned items to other user
       // display wallet and items in user profiles
     }

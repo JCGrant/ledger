@@ -24,6 +24,16 @@ export async function insertUser({ name }) {
   return convertUser(result.rows[0]);
 }
 
+export async function updateUser(id, values) {
+  const sqlValues = values
+    .map(([column, value]) => `${column} = ${value}`)
+    .join(", ");
+  const result = await pool.query(
+    `UPDATE users SET ${sqlValues} WHERE id = ${id} RETURNING *`
+  );
+  return convertUser(result.rows[0]);
+}
+
 function convertItem(dbItem) {
   return {
     id: dbItem.id,

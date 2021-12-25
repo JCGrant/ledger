@@ -6,16 +6,7 @@ import { BACKEND_HOST } from "./config.js";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import TransactionList from "./components/TransactionList";
-
-function arrToMap(array) {
-  return array.reduce(
-    (acc, object) => ({
-      ...acc,
-      [object.id]: object,
-    }),
-    {}
-  );
-}
+import { arrToMap } from "common/utils";
 
 function App() {
   const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
