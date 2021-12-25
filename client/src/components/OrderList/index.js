@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const Order = ({
   id,
   item,
@@ -26,18 +28,27 @@ const Order = ({
 };
 
 const OrderList = ({ localUser, orders, onClickDeleteOrder }) => {
+  const [showCompleted, setShowCompleted] = useState(false);
+  const toggleShowCompleted = () => {
+    setShowCompleted((showCompleted) => !showCompleted);
+  };
   return (
     <div>
       <h1>Orders</h1>
+      <button onClick={toggleShowCompleted}>
+        {showCompleted ? "Hide" : "Show"} completed Orders
+      </button>
       <ul>
-        {orders.map((order) => (
-          <Order
-            key={order.id}
-            {...order}
-            localUser={localUser}
-            onClickDelete={onClickDeleteOrder(order)}
-          />
-        ))}
+        {orders
+          .filter((order) => (showCompleted ? true : !order.completed))
+          .map((order) => (
+            <Order
+              key={order.id}
+              {...order}
+              localUser={localUser}
+              onClickDelete={onClickDeleteOrder(order)}
+            />
+          ))}
       </ul>
     </div>
   );
