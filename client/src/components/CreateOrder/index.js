@@ -2,13 +2,13 @@ import { useState } from "react";
 import Select from "react-select";
 
 const CreateOrder = ({ items, onCreateOrder }) => {
-  const [itemId, setItemId] = useState(undefined);
+  const [selectedItem, setSelectedItem] = useState(undefined);
   const [direction, setDirection] = useState("buy");
   const [amount, setAmount] = useState(1);
   const [price, setPrice] = useState(0);
 
-  const onChangeItem = (e) => {
-    setItemId(e.value);
+  const onChangeItem = (item) => {
+    setSelectedItem(item);
   };
 
   const onChangeDirection = (e) => {
@@ -29,7 +29,7 @@ const CreateOrder = ({ items, onCreateOrder }) => {
   };
 
   const onSubmitButton = () => {
-    if (itemId === undefined) {
+    if (selectedItem === undefined) {
       return;
     }
     if (amount === undefined || amount === 0) {
@@ -39,17 +39,22 @@ const CreateOrder = ({ items, onCreateOrder }) => {
       return;
     }
     onCreateOrder({
-      itemId,
+      itemId: selectedItem.value,
       direction,
       amount,
       price,
     });
+    setSelectedItem(undefined);
+    setDirection("buy");
+    setAmount(1);
+    setPrice(0);
   };
 
   return (
     <div>
       <h1>Create an Order</h1>
       <Select
+        value={selectedItem ?? null}
         onChange={onChangeItem}
         options={Object.values(items).map(({ id, name }) => ({
           value: id,
