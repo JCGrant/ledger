@@ -12,7 +12,6 @@ const CreateOrder = ({ items, onCreateOrder }) => {
   };
 
   const onChangeDirection = (e) => {
-    console.log(e.target.value);
     setDirection(e.target.value);
   };
 

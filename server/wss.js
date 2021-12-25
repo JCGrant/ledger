@@ -1,7 +1,59 @@
 import { WebSocketServer } from "ws";
-import { insertOrders, getState } from "./db.js";
+import {
+  insertOrders,
+  getState,
+  getOrders,
+  getItems,
+  updateOrder,
+} from "./db.js";
 
 const wss = new WebSocketServer({ noServer: true });
+
+setInterval(async () => {
+  const [items, orders] = await Promise.all([getItems(), getOrders()]);
+  items.forEach(async (item) => {
+    const buys = orders
+      .filter(
+        (order) =>
+          !order.completed &&
+          order.direction === "buy" &&
+          order.itemId === item.id
+      )
+      .sort((a, b) => b.price - a.price);
+    const highestBuy = buys[0];
+    if (!highestBuy) {
+      return;
+    }
+    const sells = orders
+      .filter(
+        (order) =>
+          !order.completed &&
+          order.direction === "sell" &&
+          order.itemId === item.id &&
+          order.userId !== highestBuy.userId
+      )
+      .sort((a, b) => a.price - b.price);
+    const lowestSell = sells[0];
+    if (!lowestSell) {
+      return;
+    }
+    const updatedOrders = await Promise.all([
+      updateOrder(highestBuy.id, [["completed", true]]),
+      updateOrder(lowestSell.id, [["completed", true]]),
+    ]);
+    const event = {
+      type: "ORDERS_COMPLETED",
+      payload: {
+        orders: updatedOrders,
+      },
+    };
+    wss.clients.forEach((client) => client.send(JSON.stringify(event)));
+    // create transaction
+    // update user wallet
+    // create user inventory, and move the owned items to other user
+    // display wallet and items in user profiles
+  });
+}, 1000);
 
 wss.on("connection", async function connection(ws) {
   ws.send(

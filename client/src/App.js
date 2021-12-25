@@ -30,10 +30,24 @@ function App() {
   }, []);
 
   const addOrders = (orders) => {
-    setState({
+    setState((state) => ({
       ...state,
       orders: [...orders, ...state.orders],
-    });
+    }));
+  };
+
+  const updateOrder = (id, newState) => {
+    setState((state) => ({
+      ...state,
+      orders: state.orders.map((order) =>
+        order.id !== id
+          ? order
+          : {
+              ...order,
+              ...newState,
+            }
+      ),
+    }));
   };
 
   useEffect(() => {
@@ -55,6 +69,9 @@ function App() {
         return;
       case "NEW_ORDERS":
         addOrders(event.payload.orders);
+        return;
+      case "ORDERS_COMPLETED":
+        event.payload.orders.forEach((order) => updateOrder(order.id, order));
         return;
       default:
         return;
