@@ -1,0 +1,20 @@
+.order-list {
+  .order-list-wrapper {
+    li.order-item {
+      padding: 0.5rem;
+      text-decoration: none;
+      border: 1px solid;
+      display: inline-flex;
+      margin: 0.1rem 0;
+      height: 60px;
+      width: 100%;
+      align-items: center;
+
+      button {
+        padding: 0.05rem;
+        width: 25px;
+        height: 25px;
+      }
+    }
+  }
+}

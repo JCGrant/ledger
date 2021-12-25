@@ -13,6 +13,7 @@ const Order = ({
   const wasOrderedByLocalUser = user.id === localUser.id;
   return (
     <li
+      className="order-item"
       key={id}
       style={{
         color: direction === "buy" ? "green" : "red",
@@ -33,12 +34,12 @@ const OrderList = ({ localUser, orders, onClickDeleteOrder }) => {
     setShowCompleted((showCompleted) => !showCompleted);
   };
   return (
-    <div>
+    <div className="order-list container">
       <h1>Orders</h1>
       <button onClick={toggleShowCompleted}>
         {showCompleted ? "Hide" : "Show"} completed Orders
       </button>
-      <ul>
+      <ul className="order-list-wrapper">
         {orders
           .filter((order) => (showCompleted ? true : !order.completed))
           .map((order) => (

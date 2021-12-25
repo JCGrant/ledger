@@ -12,11 +12,13 @@ const Home = ({ user, users }) => {
           <Link to={"/orders"}>View existing Orders</Link>
         </p>
       </div>
-      <div>
-        <h2>User Profiles</h2>
+      <div className="users-wrapper">
+        <h2 className="heading-2">User Profiles</h2>
         {users.map((user) => (
-          <div key={user.id}>
-            <Link to={`/users/${user.id}`}>{user.name}</Link>
+          <div className="user" key={user.id}>
+            <Link className="user-link" to={`/users/${user.id}`}>
+              {user.name}
+            </Link>
           </div>
         ))}
       </div>
