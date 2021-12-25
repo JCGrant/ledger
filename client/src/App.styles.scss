@@ -1,0 +1,24 @@
+@import "./styles/_variables.scss";
+@import "./styles/_common.scss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  body {
+    font-family: sans-serif;
+    background-color: $light-white;
+    color: $light-grey;
+
+    .header {
+      nav.navigation {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
+  }
+}

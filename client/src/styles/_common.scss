@@ -1,0 +1,29 @@
+@import "./_variables.scss";
+
+.bold {
+  font-weight: $font-bold;
+}
+
+.hide {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.space-lg {
+  margin: $large;
+}
+
+.space-md {
+  margin: $medium;
+}
+
+.space-sm {
+  margin: $small;
+}
+
+.flex {
+  display: flex;
+}

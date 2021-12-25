@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Select from "react-select";
+import "./styles.scss";
 
 const CreateOrder = ({ user, items, onCreateOrder }) => {
   const [selectedItem, setSelectedItem] = useState(undefined);
@@ -50,10 +51,11 @@ const CreateOrder = ({ user, items, onCreateOrder }) => {
   };
 
   return (
-    <div>
-      <h1>Create an Order</h1>
+    <div className="create-order container">
+      <h1 className="heading-1 bold">Create an Order</h1>
       <p>Num tokens: {user.numTokens}</p>
       <Select
+        className="dropdown"
         value={selectedItem ?? null}
         onChange={onChangeItem}
         options={Object.values(items).map(({ id, name }) => ({
@@ -61,29 +63,31 @@ const CreateOrder = ({ user, items, onCreateOrder }) => {
           label: name,
         }))}
       />
-      <div>
+      <div className="button-wrapper">
         <select value={direction} onChange={onChangeDirection}>
           <option value="buy">Buy</option>
           <option value="sell">Sell</option>
         </select>
       </div>
-      <label>
-        Amount:{" "}
-        <input
-          value={amount ?? ""}
-          onChange={onChangeRequestedAmount}
-          type="number"
-        />
-      </label>
-      <label>
-        Price:{" "}
-        <input
-          value={price ?? ""}
-          onChange={onChangeRequestedPrice}
-          type="number"
-        />
-      </label>
-      <div>
+      <div className="label-wrapper">
+        <label>
+          Amount:{" "}
+          <input
+            value={amount ?? ""}
+            onChange={onChangeRequestedAmount}
+            type="number"
+          />
+        </label>
+        <label>
+          Price:{" "}
+          <input
+            value={price ?? ""}
+            onChange={onChangeRequestedPrice}
+            type="number"
+          />
+        </label>
+      </div>
+      <div className="submit-wrapper">
         <button onClick={onSubmitButton}>Submit</button>
       </div>
     </div>
