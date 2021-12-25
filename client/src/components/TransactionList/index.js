@@ -5,7 +5,7 @@ const Transaction = ({ id, sellOrder, buyOrder, timestamp }) => {
   const itemName = sellOrder.item.name;
   const sellerName = sellOrder.user.name;
   const buyerName = buyOrder.user.name;
-  const settledPrice = (buyOrder.price + sellOrder.price) / 2;
+  const settledPrice = Math.floor((buyOrder.price + sellOrder.price) / 2);
   return (
     <tr className="transaction" key={id}>
       <td>{itemName}</td>
