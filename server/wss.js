@@ -59,6 +59,11 @@ setInterval(async () => {
       }
       const [highestBuy, lowestSell] = pair;
       const settledPrice = (highestBuy.price + lowestSell.price) / 2;
+      const buyer = userMap[highestBuy.userId];
+      const seller = userMap[lowestSell.userId];
+      if (seller.numTokens < settledPrice) {
+        return;
+      }
       const [
         updatedHighestBuy,
         updatedLowestSell,
@@ -73,10 +78,10 @@ setInterval(async () => {
           sellOrderId: lowestSell.id,
         }),
         updateUser(highestBuy.userId, [
-          ["num_tokens", userMap[highestBuy.userId].numTokens - settledPrice],
+          ["num_tokens", buyer.numTokens - settledPrice],
         ]),
         updateUser(lowestSell.userId, [
-          ["num_tokens", userMap[lowestSell.userId].numTokens + settledPrice],
+          ["num_tokens", seller.numTokens + settledPrice],
         ]),
       ]);
       console.log(pair);
