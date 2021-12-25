@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import CreateOrder from "./components/CreateOrder";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import OrderList from "./components/OrderList";
 import { BACKEND_HOST } from "./config.js";
+import Home from "./components/Home";
+import Login from "./components/Login";
 
 function arrToMap(array) {
   return array.reduce(
@@ -16,12 +18,16 @@ function arrToMap(array) {
 
 function App() {
   const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
-  const [state, setState] = useState({
-    orders: [],
-    users: [],
-    items: [],
-  });
-  const [userId, setUserId] = useState(5); // temp manual id
+  const [state, setState] = useState(undefined);
+  const [userId, setUserId] = useState(undefined);
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    if (!storedUserId) {
+      return;
+    }
+    setUserId(storedUserId);
+  }, []);
 
   const addOrders = (orders) => {
     setState({
@@ -64,8 +70,19 @@ function App() {
     });
   };
 
+  const onLogin = (userId) => {
+    setUserId(userId);
+    localStorage.setItem("userId", userId);
+  };
+
+  if (!state) {
+    return <div>loading...</div>;
+  }
   const userMap = arrToMap(state.users);
   const itemMap = arrToMap(state.items);
+  if (userId === undefined) {
+    return <Login users={state.users} onLogin={onLogin} />;
+  }
   return (
     <BrowserRouter>
       <Routes>
@@ -87,6 +104,8 @@ function App() {
             />
           }
         />
+        <Route path="/" element={<Home user={userMap[userId]} />} />
+        <Route path="*" element={<Navigate replace to="/" />} />
       </Routes>
     </BrowserRouter>
   );

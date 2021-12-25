@@ -48,6 +48,7 @@ const CreateOrder = ({ items, onCreateOrder }) => {
 
   return (
     <div>
+      <h1>Create an Order</h1>
       <Select
         onChange={onChangeItem}
         options={Object.values(items).map(({ id, name }) => ({
