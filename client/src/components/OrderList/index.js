@@ -23,7 +23,7 @@ const Order = ({
       }}
     >
       <span>
-        {user.name} is {direction}ing a{" "}
+        <Link to={`/users/${user.id}`}>{user.name}</Link> is {direction}ing a{" "}
         <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens{" "}
         {onClickDelete && !completed && wasOrderedByLocalUser && (
           <button onClick={onClickDelete}>X</button>

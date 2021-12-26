@@ -194,7 +194,7 @@ function App() {
             />
             <Route
               path="/users/:userId"
-              element={<UserProfile userMap={userMap} />}
+              element={<UserProfile userMap={userMap} allOrders={orders} />}
             />
             <Route
               path="/items/:itemId"
