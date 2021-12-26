@@ -48,10 +48,10 @@ function getBuySellPair(orders, item) {
 
 setInterval(async () => {
   const items = await getItems();
-  const users = await getUsers();
-  const userMap = arrToMap(users);
   items.forEach(async (item) => {
     while (true) {
+      const users = await getUsers();
+      const userMap = arrToMap(users);
       const orders = await getOrders();
       const pair = getBuySellPair(orders, item);
       if (!pair) {
