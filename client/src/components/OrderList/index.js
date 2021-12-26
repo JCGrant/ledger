@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./styles.scss";
 
 const Order = ({
@@ -11,7 +12,7 @@ const Order = ({
   localUser,
   onClickDelete,
 }) => {
-  const wasOrderedByLocalUser = user.id === localUser.id;
+  const wasOrderedByLocalUser = localUser && user.id === localUser.id;
   return (
     <li
       className="order-item"
@@ -21,10 +22,13 @@ const Order = ({
         textDecoration: completed ? "line-through" : "none",
       }}
     >
-      {user.name} is {direction}ing a {item.name} for {price} tokens{" "}
-      {!completed && wasOrderedByLocalUser && (
-        <button onClick={onClickDelete}>X</button>
-      )}
+      <span>
+        {user.name} is {direction}ing a{" "}
+        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens{" "}
+        {onClickDelete && !completed && wasOrderedByLocalUser && (
+          <button onClick={onClickDelete}>X</button>
+        )}
+      </span>
     </li>
   );
 };
@@ -36,7 +40,6 @@ const OrderList = ({ localUser, orders, onClickDeleteOrder }) => {
   };
   return (
     <div className="order-list container">
-      <h1>Orders</h1>
       <button onClick={toggleShowCompleted}>
         {showCompleted ? "Hide" : "Show"} completed Orders
       </button>
@@ -48,7 +51,7 @@ const OrderList = ({ localUser, orders, onClickDeleteOrder }) => {
               key={order.id}
               {...order}
               localUser={localUser}
-              onClickDelete={onClickDeleteOrder(order)}
+              onClickDelete={onClickDeleteOrder && onClickDeleteOrder(order)}
             />
           ))}
       </ul>

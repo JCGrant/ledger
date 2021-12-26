@@ -9,6 +9,7 @@ import TransactionList from "./components/TransactionList";
 import { arrToMap } from "common/utils";
 import UserProfile from "./components/UserProfile";
 import "./App.styles.scss";
+import ItemPage from "./components/ItemPage";
 
 function App() {
   const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
@@ -177,11 +178,14 @@ function App() {
             <Route
               path="/orders"
               element={
-                <OrderList
-                  orders={orders}
-                  localUser={localUser}
-                  onClickDeleteOrder={onClickDeleteOrder}
-                />
+                <div>
+                  <h1>Orders</h1>
+                  <OrderList
+                    orders={orders}
+                    localUser={localUser}
+                    onClickDeleteOrder={onClickDeleteOrder}
+                  />
+                </div>
               }
             />
             <Route
@@ -191,6 +195,10 @@ function App() {
             <Route
               path="/users/:userId"
               element={<UserProfile userMap={userMap} />}
+            />
+            <Route
+              path="/items/:itemId"
+              element={<ItemPage itemMap={itemMap} allOrders={orders} />}
             />
             <Route path="/" element={<Home user={localUser} users={users} />} />
             <Route path="*" element={<Navigate replace to="/" />} />
