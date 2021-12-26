@@ -12,7 +12,7 @@ import "./App.styles.scss";
 import ItemPage from "./components/ItemPage";
 
 function App() {
-  const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}:3001/ws`));
+  const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}/ws`));
   const [state, setState] = useState(undefined);
   const [userId, setUserId] = useState(undefined);
 
