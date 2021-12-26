@@ -159,8 +159,8 @@ function App() {
           <nav className="navigation">
             <Link to="/">Home</Link>
             <Link to="/orders/new">Create Order</Link>
-            <Link to="/orders">View Orders</Link>
-            <Link to="/transactions">View Transactions</Link>
+            <Link to="/orders">View All Orders</Link>
+            <Link to="/transactions">View All Transactions</Link>
           </nav>
         </header>
         <main className="container">
