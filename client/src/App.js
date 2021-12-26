@@ -190,15 +190,32 @@ function App() {
             />
             <Route
               path="/transactions"
-              element={<TransactionList transactions={transactions} />}
+              element={
+                <div>
+                  <h1>Transactions</h1>
+                  <TransactionList transactions={transactions} />
+                </div>
+              }
             />
             <Route
               path="/users/:userId"
-              element={<UserProfile userMap={userMap} allOrders={orders} />}
+              element={
+                <UserProfile
+                  userMap={userMap}
+                  allOrders={orders}
+                  allTransactions={transactions}
+                />
+              }
             />
             <Route
               path="/items/:itemId"
-              element={<ItemPage itemMap={itemMap} allOrders={orders} />}
+              element={
+                <ItemPage
+                  itemMap={itemMap}
+                  allOrders={orders}
+                  allTransactions={transactions}
+                />
+              }
             />
             <Route path="/" element={<Home user={localUser} users={users} />} />
             <Route path="*" element={<Navigate replace to="/" />} />
