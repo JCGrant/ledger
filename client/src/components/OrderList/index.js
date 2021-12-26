@@ -25,10 +25,10 @@ const Order = ({
       <span>
         <Link to={`/users/${user.id}`}>{user.name}</Link> is {direction}ing a{" "}
         <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens{" "}
-        {onClickDelete && !completed && wasOrderedByLocalUser && (
-          <button onClick={onClickDelete}>X</button>
-        )}
       </span>
+      {onClickDelete && !completed && wasOrderedByLocalUser && (
+        <button onClick={onClickDelete}>X</button>
+      )}
     </li>
   );
 };
