@@ -14,6 +14,38 @@ import {
 
 const wss = new WebSocketServer({ noServer: true });
 
+function compareSellOrders(a, b) {
+  if (a.price < b.price) {
+    return -1;
+  }
+  if (a.price > b.price) {
+    return 1;
+  }
+  if (a.timestamp < b.timestamp) {
+    return -1;
+  }
+  if (a.timestamp > b.timestamp) {
+    return 1;
+  }
+  return 0;
+}
+
+function compareBuyOrders(a, b) {
+  if (a.price < b.price) {
+    return 1;
+  }
+  if (a.price > b.price) {
+    return -1;
+  }
+  if (a.timestamp < b.timestamp) {
+    return -1;
+  }
+  if (a.timestamp > b.timestamp) {
+    return 1;
+  }
+  return 0;
+}
+
 function getBuySellPair(orders, item) {
   const buys = orders
     .filter(
@@ -22,7 +54,7 @@ function getBuySellPair(orders, item) {
         order.direction === "buy" &&
         order.itemId === item.id
     )
-    .sort((a, b) => b.price - a.price);
+    .sort(compareSellOrders);
   const highestBuy = buys[0];
   if (!highestBuy) {
     return;
@@ -35,7 +67,7 @@ function getBuySellPair(orders, item) {
         order.itemId === item.id &&
         order.userId !== highestBuy.userId
     )
-    .sort((a, b) => a.price - b.price);
+    .sort(compareBuyOrders);
   const lowestSell = sells[0];
   if (!lowestSell) {
     return;
