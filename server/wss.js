@@ -54,7 +54,7 @@ function getBuySellPair(orders, item) {
         order.direction === "buy" &&
         order.itemId === item.id
     )
-    .sort(compareSellOrders);
+    .sort(compareBuyOrders);
   const highestBuy = buys[0];
   if (!highestBuy) {
     return;
@@ -67,7 +67,7 @@ function getBuySellPair(orders, item) {
         order.itemId === item.id &&
         order.userId !== highestBuy.userId
     )
-    .sort(compareBuyOrders);
+    .sort(compareSellOrders);
   const lowestSell = sells[0];
   if (!lowestSell) {
     return;
