@@ -91,6 +91,7 @@ const Order = ({
   onClickDelete,
   allTransactions,
   onCreateOrder,
+  onChangePrice,
 }) => {
   const date = new Date(timestamp);
   const transactions = allTransactions.filter(
@@ -104,6 +105,15 @@ const Order = ({
     ? Math.abs(percentageDifference.toFixed(0))
     : "?";
 
+  const onChangePriceInput = (e) => {
+    const valueStr = e.target.value;
+    if (valueStr === "") {
+      return;
+    }
+    const value = parseInt(valueStr, 10);
+    onChangePrice(value);
+  };
+
   return (
     <li
       className="order-item"
@@ -116,8 +126,13 @@ const Order = ({
       <span className="order-column">
         {date.toLocaleTimeString()}:{" "}
         <Link to={`/users/${user.id}`}>{user.name}</Link> is {direction}ing a{" "}
-        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens. (
-        {differenceSymbol}
+        <Link to={`/items/${item.id}`}>{item.name}</Link> for{" "}
+        {onChangePrice ? (
+          <input value={price} onChange={onChangePriceInput} type="number" />
+        ) : (
+          price
+        )}{" "}
+        tokens. ({differenceSymbol}
         {renderedPercentageDifference}%, MP: {marketPrice ?? "?"})
       </span>
       {!completed && (
@@ -148,6 +163,7 @@ const OrderList = ({
   onClickDeleteOrder,
   allTransactions,
   onCreateOrder,
+  onChangeOrderPrice,
 }) => {
   const [showCompleted, setShowCompleted] = useState(false);
   const toggleShowCompleted = () => {
@@ -165,9 +181,10 @@ const OrderList = ({
             <Order
               key={order.id}
               {...order}
-              onClickDelete={onClickDeleteOrder && onClickDeleteOrder(order)}
+              onClickDelete={onClickDeleteOrder(order)}
               allTransactions={allTransactions}
               onCreateOrder={onCreateOrder}
+              onChangePrice={onChangeOrderPrice(order)}
             />
           ))}
       </ul>

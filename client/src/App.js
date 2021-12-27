@@ -79,6 +79,21 @@ function App() {
     };
   };
 
+  const onChangeOrderPrice = ({ id, userId }) => {
+    if (userId !== localUserId) {
+      return undefined;
+    }
+    return (price) => {
+      send({
+        type: "CHANGE_ORDER_PRICE",
+        payload: {
+          id,
+          price,
+        },
+      });
+    };
+  };
+
   const onLogin = (userId) => {
     setLocalUserId(userId);
     localStorage.setItem("userId", userId);
@@ -121,6 +136,7 @@ function App() {
                     onClickDeleteOrder={onClickDeleteOrder}
                     allTransactions={transactions}
                     onCreateOrder={onCreateOrder}
+                    onChangeOrderPrice={onChangeOrderPrice}
                   />
                 </div>
               }
@@ -142,6 +158,8 @@ function App() {
                   allOrders={orders}
                   allTransactions={transactions}
                   onClickDeleteOrder={onClickDeleteOrder}
+                  onCreateOrder={onCreateOrder}
+                  onChangeOrderPrice={onChangeOrderPrice}
                 />
               }
             />
@@ -153,6 +171,8 @@ function App() {
                   allOrders={orders}
                   allTransactions={transactions}
                   onClickDeleteOrder={onClickDeleteOrder}
+                  onCreateOrder={onCreateOrder}
+                  onChangeOrderPrice={onChangeOrderPrice}
                 />
               }
             />

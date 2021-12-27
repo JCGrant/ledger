@@ -7,6 +7,8 @@ const UserProfile = ({
   allOrders,
   allTransactions,
   onClickDeleteOrder,
+  onCreateOrder,
+  onChangeOrderPrice,
 }) => {
   const { userId: userIdStr } = useParams();
   const userId = parseInt(userIdStr, 10);
@@ -26,6 +28,8 @@ const UserProfile = ({
         orders={orders}
         onClickDeleteOrder={onClickDeleteOrder}
         allTransactions={allTransactions}
+        onCreateOrder={onCreateOrder}
+        onChangeOrderPrice={onChangeOrderPrice}
       />
       <h2>Transactions</h2>
       <TransactionList transactions={transactions} />

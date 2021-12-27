@@ -60,6 +60,8 @@ export function stateReducer(state, action) {
       return ordersCompleted(state, action.payload);
     case "DELETE_ORDER":
       return deleteOrder(state, action.payload.order);
+    case "CHANGE_ORDER_PRICE":
+      return updateOrder(state, action.payload.order);
     default:
       console.error(`invalid action type: ${action.type}`);
       return state;

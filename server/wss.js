@@ -172,6 +172,17 @@ wss.on("connection", async function connection(ws) {
         wss.clients.forEach((client) => client.send(JSON.stringify(event)));
         return;
       }
+      case "CHANGE_ORDER_PRICE": {
+        const { id, price } = action.payload;
+        const updatedOrder = await updateOrder(id, [["price", price]]);
+        const event = {
+          type: "CHANGE_ORDER_PRICE",
+          payload: {
+            order: updatedOrder,
+          },
+        };
+        wss.clients.forEach((client) => client.send(JSON.stringify(event)));
+      }
     }
   });
 });

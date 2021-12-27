@@ -8,6 +8,8 @@ const ItemPage = ({
   allOrders,
   allTransactions,
   onClickDeleteOrder,
+  onCreateOrder,
+  onChangeOrderPrice,
 }) => {
   const { itemId: itemIdStr } = useParams();
   const itemId = parseInt(itemIdStr, 10);
@@ -35,6 +37,8 @@ const ItemPage = ({
         orders={orders}
         onClickDeleteOrder={onClickDeleteOrder}
         allTransactions={allTransactions}
+        onCreateOrder={onCreateOrder}
+        onChangeOrderPrice={onChangeOrderPrice}
       />
       <h2>Transactions</h2>
       <TransactionList transactions={transactions} />
