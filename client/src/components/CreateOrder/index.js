@@ -1,8 +1,9 @@
+import { calculateSettledPrice } from "common";
 import { useState } from "react";
 import Select from "react-select";
 import "./styles.scss";
 
-const CreateOrder = ({ user, items, onCreateOrder }) => {
+const CreateOrder = ({ user, items, onCreateOrder, allTransactions }) => {
   const [selectedItem, setSelectedItem] = useState(undefined);
   const [direction, setDirection] = useState("buy");
   const [amount, setAmount] = useState(1);
@@ -50,6 +51,13 @@ const CreateOrder = ({ user, items, onCreateOrder }) => {
     setPrice(0);
   };
 
+  const transactions = allTransactions.filter(
+    (transaction) =>
+      transaction.buyOrder.itemId === (selectedItem && selectedItem.value)
+  );
+  const lastTransaction = transactions?.[0];
+  const marketPrice = lastTransaction && calculateSettledPrice(lastTransaction);
+
   return (
     <div className="create-order container">
       <h1 className="heading-1 bold">Create an Order</h1>
@@ -63,6 +71,17 @@ const CreateOrder = ({ user, items, onCreateOrder }) => {
           label: name,
         }))}
       />
+      <div>
+        <p>Market Price: {marketPrice ?? "unknown"} tokens</p>
+        <p>
+          Last Buy Offer:{" "}
+          {lastTransaction ? lastTransaction.buyOrder.price : "unknown"} tokens
+        </p>
+        <p>
+          Last Sell Offer:{" "}
+          {lastTransaction ? lastTransaction.sellOrder.price : "unknown"} tokens
+        </p>
+      </div>
       <div className="button-wrapper">
         <select value={direction} onChange={onChangeDirection}>
           <option value="buy">Buy</option>

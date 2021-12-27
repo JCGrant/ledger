@@ -107,6 +107,7 @@ function App() {
                   user={localUser}
                   items={items}
                   onCreateOrder={onCreateOrder}
+                  allTransactions={transactions}
                 />
               }
             />
