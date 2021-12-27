@@ -3,6 +3,10 @@ const { Pool } = pg;
 
 const pool = new Pool();
 
+export async function end() {
+  return pool.end();
+}
+
 function convertUser(dbUser) {
   return {
     id: dbUser.id,
