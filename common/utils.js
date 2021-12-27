@@ -10,7 +10,7 @@ export function arrToMap(array) {
 
 export const compose = (...fns) =>
   fns.reduce(
-    (acc, f) => (x) => f(acc(...args)),
+    (acc, f) => (x) => f(acc(x)),
     (x) => x
   );
 
