@@ -119,6 +119,7 @@ function App() {
                   <OrderList
                     orders={orders}
                     onClickDeleteOrder={onClickDeleteOrder}
+                    allTransactions={transactions}
                   />
                 </div>
               }

@@ -1,3 +1,4 @@
+import { calculateSettledPrice } from "common";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./styles.scss";
@@ -11,8 +12,15 @@ const Order = ({
   completed,
   timestamp,
   onClickDelete,
+  allTransactions,
 }) => {
   const date = new Date(timestamp);
+  const transactions = allTransactions.filter(
+    (transaction) => transaction.buyOrder.itemId === item.id
+  );
+  const lastTransaction = transactions[0];
+  const marketPrice = lastTransaction && calculateSettledPrice(lastTransaction);
+  const percentageDifference = ((price - marketPrice) / marketPrice) * 100 || 0;
   return (
     <li
       className="order-item"
@@ -25,14 +33,16 @@ const Order = ({
       <span>
         {date.toLocaleTimeString()}:{" "}
         <Link to={`/users/${user.id}`}>{user.name}</Link> is {direction}ing a{" "}
-        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens
+        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens (
+        {percentageDifference >= 0 ? "⬆" : "⬇"}
+        {Math.abs(percentageDifference.toFixed(0))}%)
       </span>
       {onClickDelete && <button onClick={onClickDelete}>X</button>}
     </li>
   );
 };
 
-const OrderList = ({ orders, onClickDeleteOrder }) => {
+const OrderList = ({ orders, onClickDeleteOrder, allTransactions }) => {
   const [showCompleted, setShowCompleted] = useState(false);
   const toggleShowCompleted = () => {
     setShowCompleted((showCompleted) => !showCompleted);
@@ -50,6 +60,7 @@ const OrderList = ({ orders, onClickDeleteOrder }) => {
               key={order.id}
               {...order}
               onClickDelete={onClickDeleteOrder && onClickDeleteOrder(order)}
+              allTransactions={allTransactions}
             />
           ))}
       </ul>

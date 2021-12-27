@@ -31,7 +31,11 @@ const ItemPage = ({
         {lastTransaction ? lastTransaction.sellOrder.price : "unknown"} tokens
       </p>
       <h2>Orders</h2>
-      <OrderList orders={orders} onClickDeleteOrder={onClickDeleteOrder} />
+      <OrderList
+        orders={orders}
+        onClickDeleteOrder={onClickDeleteOrder}
+        allTransactions={allTransactions}
+      />
       <h2>Transactions</h2>
       <TransactionList transactions={transactions} />
     </div>

@@ -22,7 +22,11 @@ const UserProfile = ({
       <h1>{name}'s Profile</h1>
       <p>Tokens: {numTokens}</p>
       <h2>Orders</h2>
-      <OrderList orders={orders} onClickDeleteOrder={onClickDeleteOrder} />
+      <OrderList
+        orders={orders}
+        onClickDeleteOrder={onClickDeleteOrder}
+        allTransactions={allTransactions}
+      />
       <h2>Transactions</h2>
       <TransactionList transactions={transactions} />
     </div>
