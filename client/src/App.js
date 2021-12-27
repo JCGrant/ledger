@@ -120,6 +120,7 @@ function App() {
                     orders={orders}
                     onClickDeleteOrder={onClickDeleteOrder}
                     allTransactions={transactions}
+                    onCreateOrder={onCreateOrder}
                   />
                 </div>
               }

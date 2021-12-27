@@ -4,17 +4,35 @@
       padding: 0.5rem;
       text-decoration: none;
       border: 1px solid;
-      display: inline-flex;
+      display: flex;
       justify-content: space-between;
       margin: 0.1rem 0;
-      height: 60px;
       width: 100%;
       align-items: center;
 
-      button {
+      .delete-button {
         padding: 0.05rem;
         width: 25px;
         height: 25px;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1200px) {
+  .order-list {
+    .order-list-wrapper {
+      li.order-item {
+        display: flex;
+        flex-direction: column;
+
+        .order-column {
+          padding: 10px;
+
+          input {
+            width: 100px;
+          }
+        }
       }
     }
   }

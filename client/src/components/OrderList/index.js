@@ -3,6 +3,83 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./styles.scss";
 
+const CreateOrderInlign = ({
+  item,
+  onCreateOrder,
+  defaultDirection,
+  defaultPrice,
+}) => {
+  const [direction, setDirection] = useState(defaultDirection);
+  const [amount, setAmount] = useState(1);
+  const [price, setPrice] = useState(defaultPrice);
+
+  const onChangeDirection = (e) => {
+    setDirection(e.target.value);
+  };
+
+  const onChangeRequestedAmount = (e) => {
+    const valueStr = e.target.value;
+    const value = valueStr === "" ? undefined : parseInt(valueStr, 10);
+    setAmount(value);
+  };
+
+  const onChangeRequestedPrice = (e) => {
+    const valueStr = e.target.value;
+    const value = valueStr === "" ? undefined : parseInt(valueStr, 10);
+    setPrice(value);
+  };
+
+  const onSubmitButton = () => {
+    if (amount === undefined || amount === 0) {
+      return;
+    }
+    if (price === undefined || price === 0) {
+      return;
+    }
+    onCreateOrder({
+      itemId: item.id,
+      direction,
+      amount,
+      price,
+    });
+    setDirection(defaultDirection);
+    setAmount(1);
+    setPrice(defaultPrice);
+  };
+
+  return (
+    <span>
+      <span>
+        <select value={direction} onChange={onChangeDirection}>
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+        </select>
+      </span>
+      <span>
+        <label>
+          Amount:{" "}
+          <input
+            value={amount ?? ""}
+            onChange={onChangeRequestedAmount}
+            type="number"
+          />
+        </label>
+        <label>
+          Price:{" "}
+          <input
+            value={price ?? ""}
+            onChange={onChangeRequestedPrice}
+            type="number"
+          />
+        </label>
+      </span>
+      <span>
+        <button onClick={onSubmitButton}>Submit</button>
+      </span>
+    </span>
+  );
+};
+
 const Order = ({
   id,
   item,
@@ -13,6 +90,7 @@ const Order = ({
   timestamp,
   onClickDelete,
   allTransactions,
+  onCreateOrder,
 }) => {
   const date = new Date(timestamp);
   const transactions = allTransactions.filter(
@@ -21,6 +99,11 @@ const Order = ({
   const lastTransaction = transactions[0];
   const marketPrice = lastTransaction && calculateSettledPrice(lastTransaction);
   const percentageDifference = ((price - marketPrice) / marketPrice) * 100 || 0;
+  const differenceSymbol = percentageDifference >= 0 ? "⬆" : "⬇";
+  const renderedPercentageDifference = marketPrice
+    ? Math.abs(percentageDifference.toFixed(0))
+    : "?";
+
   return (
     <li
       className="order-item"
@@ -30,19 +113,42 @@ const Order = ({
         textDecoration: completed ? "line-through" : "none",
       }}
     >
-      <span>
+      <span className="order-column">
         {date.toLocaleTimeString()}:{" "}
         <Link to={`/users/${user.id}`}>{user.name}</Link> is {direction}ing a{" "}
-        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens (
-        {percentageDifference >= 0 ? "⬆" : "⬇"}
-        {Math.abs(percentageDifference.toFixed(0))}%)
+        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens. (
+        {differenceSymbol}
+        {renderedPercentageDifference}%, MP: {marketPrice ?? "?"})
       </span>
-      {onClickDelete && <button onClick={onClickDelete}>X</button>}
+      {!completed && (
+        <span className="order-column">
+          <CreateOrderInlign
+            item={item}
+            onCreateOrder={onCreateOrder}
+            defaultDirection={direction === "buy" ? "sell" : "buy"}
+            defaultPrice={price}
+          />
+          {onClickDelete && (
+            <button
+              className="delete-button"
+              style={{ marginLeft: 50 }}
+              onClick={onClickDelete}
+            >
+              X
+            </button>
+          )}
+        </span>
+      )}
     </li>
   );
 };
 
-const OrderList = ({ orders, onClickDeleteOrder, allTransactions }) => {
+const OrderList = ({
+  orders,
+  onClickDeleteOrder,
+  allTransactions,
+  onCreateOrder,
+}) => {
   const [showCompleted, setShowCompleted] = useState(false);
   const toggleShowCompleted = () => {
     setShowCompleted((showCompleted) => !showCompleted);
@@ -61,6 +167,7 @@ const OrderList = ({ orders, onClickDeleteOrder, allTransactions }) => {
               {...order}
               onClickDelete={onClickDeleteOrder && onClickDeleteOrder(order)}
               allTransactions={allTransactions}
+              onCreateOrder={onCreateOrder}
             />
           ))}
       </ul>
