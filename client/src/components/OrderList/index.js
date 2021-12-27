@@ -9,8 +9,10 @@ const Order = ({
   direction,
   price,
   completed,
+  timestamp,
   onClickDelete,
 }) => {
+  const date = new Date(timestamp);
   return (
     <li
       className="order-item"
@@ -21,8 +23,9 @@ const Order = ({
       }}
     >
       <span>
+        {date.toLocaleTimeString()}:{" "}
         <Link to={`/users/${user.id}`}>{user.name}</Link> is {direction}ing a{" "}
-        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens{" "}
+        <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens
       </span>
       {onClickDelete && <button onClick={onClickDelete}>X</button>}
     </li>
