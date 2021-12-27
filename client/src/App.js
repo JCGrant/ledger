@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import CreateOrder from "./components/CreateOrder";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import OrderList from "./components/OrderList";
@@ -10,126 +10,28 @@ import { arrToMap } from "common/utils";
 import UserProfile from "./components/UserProfile";
 import "./App.styles.scss";
 import ItemPage from "./components/ItemPage";
+import { stateReducer } from "./stateReducer";
 
 function App() {
   const ws = useRef(new WebSocket(`ws://${BACKEND_HOST}/ws`));
-  const [state, setState] = useState(undefined);
-  const [userId, setUserId] = useState(undefined);
+  const [state, dispatch] = useReducer(stateReducer, undefined);
+  const [localUserId, setLocalUserId] = useState(undefined);
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (!storedUserId) {
       return;
     }
-    setUserId(storedUserId);
+    setLocalUserId(parseInt(storedUserId, 10));
   }, []);
-
-  const addOrders = (orders) => {
-    setState((state) => ({
-      ...state,
-      orders: [...orders, ...state.orders],
-    }));
-  };
-
-  const updateOrder = (id, newState) => {
-    setState((state) => ({
-      ...state,
-      orders: state.orders.map((order) =>
-        order.id !== id
-          ? order
-          : {
-              ...order,
-              ...newState,
-            }
-      ),
-    }));
-  };
-
-  const deleteOrder = ({ id }) => {
-    setState((state) => ({
-      ...state,
-      orders: state.orders.filter((order) => order.id !== id),
-    }));
-  };
-
-  const addTransaction = (transaction) => {
-    setState((state) => ({
-      ...state,
-      transactions: [transaction, ...state.transactions],
-    }));
-  };
-
-  const updateUser = (id, newState) => {
-    setState((state) => ({
-      ...state,
-      users: state.users.map((user) =>
-        user.id !== id
-          ? user
-          : {
-              ...user,
-              ...newState,
-            }
-      ),
-    }));
-  };
 
   useEffect(() => {
     ws.current.onmessage = ({ data }) => {
       const event = JSON.parse(data);
-      handleEvent(event);
+      console.log(event);
+      dispatch(event);
     };
-  });
-
-  const send = (action) => {
-    ws.current.send(JSON.stringify(action));
-  };
-
-  const handleEvent = (event) => {
-    console.log(event);
-    switch (event.type) {
-      case "SEND_STATE":
-        setState(event.payload.state);
-        return;
-      case "NEW_ORDERS":
-        addOrders(event.payload.orders);
-        return;
-      case "ORDERS_COMPLETED":
-        event.payload.orders.forEach((order) => updateOrder(order.id, order));
-        addTransaction(event.payload.transaction);
-        event.payload.users.forEach((user) => updateUser(user.id, user));
-        return;
-      case "DELETE_ORDER":
-        deleteOrder(event.payload.order);
-        return;
-      default:
-        return;
-    }
-  };
-
-  const onCreateOrder = (order) => {
-    send({
-      type: "NEW_ORDER",
-      payload: {
-        order: { ...order, userId },
-      },
-    });
-  };
-
-  const onClickDeleteOrder =
-    ({ id }) =>
-    () => {
-      send({
-        type: "DELETE_ORDER",
-        payload: {
-          id,
-        },
-      });
-    };
-
-  const onLogin = (userId) => {
-    setUserId(userId);
-    localStorage.setItem("userId", userId);
-  };
+  }, []);
 
   if (!state) {
     return <div>loading...</div>;
@@ -143,13 +45,46 @@ function App() {
     item: itemMap[order.itemId],
   }));
   const orderMap = arrToMap(orders);
-  const localUser = userMap[userId];
+  const localUser = userMap[localUserId];
   const transactions = state.transactions.map((transaction) => ({
     ...transaction,
     buyOrder: orderMap[transaction.buyOrderId],
     sellOrder: orderMap[transaction.sellOrderId],
   }));
-  if (userId === undefined) {
+
+  const send = (action) => {
+    ws.current.send(JSON.stringify(action));
+  };
+
+  const onCreateOrder = (order) => {
+    send({
+      type: "NEW_ORDER",
+      payload: {
+        order: { ...order, userId: localUserId },
+      },
+    });
+  };
+
+  const onClickDeleteOrder = ({ id, userId }) => {
+    if (userId !== localUserId) {
+      return undefined;
+    }
+    return () => {
+      send({
+        type: "DELETE_ORDER",
+        payload: {
+          id,
+        },
+      });
+    };
+  };
+
+  const onLogin = (userId) => {
+    setLocalUserId(userId);
+    localStorage.setItem("userId", userId);
+  };
+
+  if (!localUserId) {
     return <Login users={users} onLogin={onLogin} />;
   }
   return (
@@ -182,7 +117,6 @@ function App() {
                   <h1>Orders</h1>
                   <OrderList
                     orders={orders}
-                    localUser={localUser}
                     onClickDeleteOrder={onClickDeleteOrder}
                   />
                 </div>
@@ -204,6 +138,7 @@ function App() {
                   userMap={userMap}
                   allOrders={orders}
                   allTransactions={transactions}
+                  onClickDeleteOrder={onClickDeleteOrder}
                 />
               }
             />
@@ -214,6 +149,7 @@ function App() {
                   itemMap={itemMap}
                   allOrders={orders}
                   allTransactions={transactions}
+                  onClickDeleteOrder={onClickDeleteOrder}
                 />
               }
             />

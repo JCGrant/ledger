@@ -9,10 +9,8 @@ const Order = ({
   direction,
   price,
   completed,
-  localUser,
   onClickDelete,
 }) => {
-  const wasOrderedByLocalUser = localUser && user.id === localUser.id;
   return (
     <li
       className="order-item"
@@ -26,14 +24,12 @@ const Order = ({
         <Link to={`/users/${user.id}`}>{user.name}</Link> is {direction}ing a{" "}
         <Link to={`/items/${item.id}`}>{item.name}</Link> for {price} tokens{" "}
       </span>
-      {onClickDelete && !completed && wasOrderedByLocalUser && (
-        <button onClick={onClickDelete}>X</button>
-      )}
+      {onClickDelete && <button onClick={onClickDelete}>X</button>}
     </li>
   );
 };
 
-const OrderList = ({ localUser, orders, onClickDeleteOrder }) => {
+const OrderList = ({ orders, onClickDeleteOrder }) => {
   const [showCompleted, setShowCompleted] = useState(false);
   const toggleShowCompleted = () => {
     setShowCompleted((showCompleted) => !showCompleted);
@@ -50,7 +46,6 @@ const OrderList = ({ localUser, orders, onClickDeleteOrder }) => {
             <Order
               key={order.id}
               {...order}
-              localUser={localUser}
               onClickDelete={onClickDeleteOrder && onClickDeleteOrder(order)}
             />
           ))}
