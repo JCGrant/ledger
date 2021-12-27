@@ -1,5 +1,5 @@
 import { WebSocketServer } from "ws";
-import { arrToMap } from "common/utils.js";
+import { arrToMap, calculateSettledPrice } from "common/utils.js";
 import {
   insertOrders,
   getState,
@@ -90,9 +90,10 @@ setInterval(async () => {
         return;
       }
       const [highestBuy, lowestSell] = pair;
-      const settledPrice = Math.floor(
-        (highestBuy.price + lowestSell.price) / 2
-      );
+      const settledPrice = calculateSettledPrice({
+        buyOrder: highestBuy,
+        sellOrder: lowestSell,
+      });
       const buyer = userMap[highestBuy.userId];
       const seller = userMap[lowestSell.userId];
       if (buyer.numTokens < settledPrice) {

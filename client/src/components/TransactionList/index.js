@@ -1,3 +1,4 @@
+import { calculateSettledPrice } from "common";
 import { Link } from "react-router-dom";
 import "./styles.scss";
 
@@ -6,7 +7,7 @@ const Transaction = ({ id, sellOrder, buyOrder, timestamp }) => {
   const item = sellOrder.item;
   const seller = sellOrder.user;
   const buyer = buyOrder.user;
-  const settledPrice = Math.floor((buyOrder.price + sellOrder.price) / 2);
+  const settledPrice = calculateSettledPrice({ buyOrder, sellOrder });
   return (
     <tr className="transaction" key={id}>
       <td>
