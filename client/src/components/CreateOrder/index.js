@@ -1,5 +1,5 @@
-import { calculateSettledPrice } from "common";
-import { useState } from "react";
+import { calculateSettledPrice, maybeGetLastTransaction } from "common";
+import { useEffect, useState } from "react";
 import Select from "react-select";
 import "./styles.scss";
 
@@ -8,6 +8,16 @@ const CreateOrder = ({ user, items, onCreateOrder, allTransactions }) => {
   const [direction, setDirection] = useState("buy");
   const [amount, setAmount] = useState(1);
   const [price, setPrice] = useState(0);
+
+  const lastTransaction = maybeGetLastTransaction(
+    allTransactions,
+    selectedItem && selectedItem.value
+  );
+  const marketPrice = lastTransaction && calculateSettledPrice(lastTransaction);
+
+  useEffect(() => {
+    setPrice(marketPrice ?? 0);
+  }, [marketPrice]);
 
   const onChangeItem = (item) => {
     setSelectedItem(item);
@@ -50,13 +60,6 @@ const CreateOrder = ({ user, items, onCreateOrder, allTransactions }) => {
     setAmount(1);
     setPrice(0);
   };
-
-  const transactions = allTransactions.filter(
-    (transaction) =>
-      transaction.buyOrder.itemId === (selectedItem && selectedItem.value)
-  );
-  const lastTransaction = transactions?.[0];
-  const marketPrice = lastTransaction && calculateSettledPrice(lastTransaction);
 
   return (
     <div className="create-order container">
